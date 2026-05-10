@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+// Имя пакета для Protobuf
+package metadata;
+
+// Указываем компилятору Go, куда положить сгенерированный код
+option go_package = "github.com/fcvf-jmail/yt-downloader/pkg/gen/metadata;metadata";
+
+// Описываем сам микросервис
+service MetadataService {
+  // Метод получения информации о видео
+  rpc GetVideoInfo (VideoRequest) returns (VideoResponse);
+}
+
+// Входящий запрос (только ссылка)
+message VideoRequest {
+  string url = 1;
+}
+
+// Ответ от сервиса
+message VideoResponse {
+  string title = 1;
+  string thumbnail_url = 2;
+  string duration = 3;
+  repeated Format formats = 4; // Массив доступных форматов
+}
+
+// Структура одного формата (качества)
+message Format {
+  string format_id = 1;
+  string resolution = 2; // например "1080p"
+  string ext = 3;        // например "mp4"
+  bool has_audio = 4;    // есть ли звук в этом потоке
+  bool has_video = 5;
+  int64 filesize_bytes = 6; // Размер в байтах
+  double audio_bitrate = 7; // Качество аудио (kbps)
+}

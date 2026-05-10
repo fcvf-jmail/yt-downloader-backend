@@ -1,0 +1,54 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    
+  metadata-service:
+    build:
+      context: .
+      dockerfile: deployments/metadata.Dockerfile
+    ports:
+      - "50051:50051"
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: deployments/gateway.Dockerfile
+    environment:
+      - METADATA_ADDR=metadata-service:50051
+      - REDIS_ADDR=redis:6379
+    depends_on:
+      - redis
+      - metadata-service
+    volumes:
+      - ./downloads:/app/downloads
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:latest
+    restart: always
+    ports:
+      - "80:80"
+      - "8443:8443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api-gateway
+    
+  worker-service:
+    build:
+      context: .
+      dockerfile: deployments/worker.Dockerfile
+    environment:
+      - REDIS_ADDR=redis:6379
+    depends_on:
+      - redis
+    volumes:
+      - ./downloads:/app/downloads
+      - ./ytCookies.txt:/app/ytCookies.txt
+    restart: unless-stopped
