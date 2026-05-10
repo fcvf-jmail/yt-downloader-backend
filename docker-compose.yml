@@ -35,8 +35,8 @@ services:
       - "8443:8443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
+      - caddy_data:
+      - caddy_config:
     depends_on:
       - api-gateway
     
