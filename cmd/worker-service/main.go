@@ -64,7 +64,6 @@ func (wp *WorkerProcessor) handleVideoDownload(ctx context.Context, t *asynq.Tas
 		"-o", "downloads/%(id)s-%(height)s.%(ext)s",
 		"--cookies", "ytCookies.txt",
 		"--js-runtimes", "node",
-		"--extractor-args", "youtube:player-client=web,android",
 		payload.VideoURL,
 	)
 
