@@ -62,8 +62,6 @@ func (wp *WorkerProcessor) handleVideoDownload(ctx context.Context, t *asynq.Tas
 		"--js-runtimes", "node",
 		"--remote-components", "ejs:github",
 		"--newline",
-		"--downloader", "aria2c",
-		"--downloader-args", "aria2c:-x 16 -s 16 -k 1M",
 		payload.VideoURL,
 	)
 
