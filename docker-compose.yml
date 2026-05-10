@@ -1,16 +1,12 @@
 services:
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
     restart: unless-stopped
-    
+
   metadata-service:
     build:
       context: .
       dockerfile: deployments/metadata.Dockerfile
-    ports:
-      - "50051:50051"
     restart: unless-stopped
 
   api-gateway:
@@ -27,19 +23,6 @@ services:
       - ./downloads:/app/downloads
     restart: unless-stopped
 
-  caddy:
-    image: caddy:latest
-    restart: always
-    ports:
-      - "80:80"
-      - "8443:8443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - api-gateway
-    
   worker-service:
     build:
       context: .
@@ -53,6 +36,9 @@ services:
       - ./ytCookies.txt:/app/ytCookies.txt
     restart: unless-stopped
 
-volumes:
-  caddy_data:
-  caddy_config:
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: always
+    environment:
+      - TUNNEL_TOKEN=eyJhIjoiOTBmMDc0ZTcwMDRmYjljZjdlMDg5YmJlYzc4Njc1YWQiLCJ0IjoiN2M4NjRkYjktY2Q2Zi00MTY3LThmYTYtMWNjNTA3ZmQ3MDVkIiwicyI6IlpUYzRPV0V6TWpRdE9HVTNZaTAwWW1RMUxXSmtOMll0TnpBM01XSTFOVE0yTnpobSJ9
+    command: tunnel --no-autoupdate run
