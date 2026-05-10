@@ -56,12 +56,15 @@ func (wp *WorkerProcessor) handleVideoDownload(ctx context.Context, t *asynq.Tas
 	}
 
 	cmd := exec.Command("yt-dlp",
+		"--force-ipv4",
+		"--limit-rate", "15M",           // Ограничиваем, чтобы не забанили
+		"--socket-timeout", "10",        // Не ждем по 30 секунд при зависании
+		"--retries", "10",
 		"-f", formatSelection,
 		"-o", "downloads/%(id)s-%(height)s.%(ext)s",
 		"--cookies", "ytCookies.txt",
 		"--js-runtimes", "node",
-		"--remote-components", "ejs:github",
-		"--newline",
+		"--extractor-args", "youtube:player-client=web,android",
 		payload.VideoURL,
 	)
 
